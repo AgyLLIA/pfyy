@@ -325,7 +325,7 @@ class game():
         if True:
             self.scenes.append(scene(0, (0, WIDTH - WIDTH//2.5), (0, HEIGHT - HEIGHT//2.3), object(WIDTH / 2 - 50, HEIGHT / 10, 50, None, 0, 'Это какой-то странный портал','portal', 1), object(WIDTH // 30, HEIGHT - HEIGHT // 30 - hero.scale * 10, hero.scale * 20, None, None, None, 'home', 0), object(WIDTH - WIDTH//3 - 25, HEIGHT - HEIGHT*1.05, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH//3, HEIGHT - HEIGHT/9*5, 100, None, None, None, 'les', 0)))
             self.scenes.append(scene(1, (WIDTH/3, WIDTH/3*2), (0, HEIGHT), object(WIDTH / 2, HEIGHT / 10, 50, None, 0, 'Вернуться', 'portal', 0), object(WIDTH/2, HEIGHT-HEIGHT//3, WIDTH/20//2, 'xarizma', 100, 'Это какой-то странный тип', 'hero_gay', 1, None, 'Иди прямо и все поймешь'), object(WIDTH - WIDTH//3 - 25, HEIGHT - HEIGHT*1.05, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH//3, HEIGHT - HEIGHT/9*5, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH - 25, HEIGHT - HEIGHT*1.05, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH, HEIGHT - HEIGHT/9*5, 100, None, None, None, 'les', 0), object(WIDTH/3, HEIGHT-HEIGHT//20, WIDTH/3, None, 0, 'Идти дальше', 'perexod', 2)))
-            self.scenes.append(scene(2, (0,WIDTH), (0,HEIGHT)))
+            self.scenes.append(scene(2, (0,WIDTH), (0,HEIGHT)))#hgdrghsxdscgx
 
     def draw(self):
         display.fill((255, 255, 255))
