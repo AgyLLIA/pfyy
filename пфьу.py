@@ -16,11 +16,7 @@ except:
 def printtext(text, rect, size):
     font = pygame.font.SysFont('arial', size)
     a = font.render(text, True, (0, 0, 0))
-
     display.blit(a, rect)
-'''
-adrhashslej;aeisbgj
-'''
 
 class hero():
     def __init__(self):
