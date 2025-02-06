@@ -17,7 +17,7 @@ def printtext(text, rect, size):
     font = pygame.font.SysFont('arial', size)
     a = font.render(text, True, (0, 0, 0))
 
-    display.blit(a, rect)
+    display.blit((a, rect))
 
 
 class hero():
