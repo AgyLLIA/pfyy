@@ -1,5 +1,5 @@
 import pygame, random, os
-
+print('ASFGHAGABGKLJHAGLJHARH')
 pygame.init()
 
 clock = pygame.time.Clock()
