@@ -23,7 +23,7 @@ class hero():
         self.pos_x = WIDTH // 6 + self.scale * 2
         self.pos_y = HEIGHT // 2 - self.scale * 5 / 2
         self.move_speed = WIDTH // 100
-        self.move_direction = 'стой'
+        self.move_direction = []
         self.char_sila = int(save_list[0])
         self.char_vinoslivost = int(save_list[1])
         self.char_xarizma = int(save_list[2])
@@ -40,15 +40,13 @@ class hero():
         pygame.draw.rect(display, (0, 0, 0),(self.pos_x + self.scale * 1.1, self.pos_y + self.scale * 3, self.scale * 0.8, self.scale * 2))
 
     def move(self):
-        if self.move_direction == 'стой':
-            pass
-        elif self.move_direction == 'вправо':
+        if 'вправо' in self.move_direction:
             self.pos_x += self.move_speed
-        elif self.move_direction == 'вниз':
+        if 'вниз' in self.move_direction:
             self.pos_y += self.move_speed
-        elif self.move_direction == 'влево':
+        if 'влево' in self.move_direction:
             self.pos_x -= self.move_speed
-        elif self.move_direction == 'вверх':
+        if 'вверх' in self.move_direction:
             self.pos_y -= self.move_speed
         x1, x2 = game.scenes[game.scene_num].x_gran
         y1, y2 = game.scenes[game.scene_num].y_gran
@@ -102,7 +100,7 @@ class menu():
 menu = menu()
 
 class object():
-    def __init__(self, x, y, scale, char, difficalt, say, type, next_num, hero_say_blin=None, hero_say_ura=None):
+    def __init__(self, x, y, scale, char, difficalt, say, type, next_num, hero_say_blin=None, hero_say_ura=None, text=None):
         self.button_x = x
         self.button_y = y
         self.button_scale = scale
@@ -114,13 +112,16 @@ class object():
         self.next_num = next_num
         self.hero_say_blin = hero_say_blin
         self.hero_say_ura = hero_say_ura
+        self.baz_text = text
 
 class scene():
-    def __init__(self, nummer, x_gran, y_gran, *args_object_):
+    def __init__(self, nummer, x_gran, y_gran, nach_pos_x, nach_pos_y, *args_object_):
         self.num = nummer
         self.x_gran = x_gran
         self.y_gran = y_gran
         self.objects = []
+        self.nach_pos_x = nach_pos_x
+        self.nach_pos_y = nach_pos_y
         for i in args_object_:
             self.objects.append(i)
         self.active_button = []
@@ -147,9 +148,11 @@ class scene():
         for i in self.active_button:
             if 'hero' not in self.objects[i].type:
                 if self.objects[i].button_used == False:
-                    if self.objects[i].type != 'portal':
+                    if self.objects[i].type != 'portal' and self.objects[i].type != 'perexod':
                         self.objects[i].button_used = True
                         a = random.randint(0, 101)
+                    else:
+                        return (True, self.objects[i].next_num)
                     if self.objects[i].button_char == 'sila':
                         if a <= hero.char_sila + self.objects[i].button_difficalt:
                             hero.expirience += 1 * (hero.char_intelect // 10)
@@ -294,7 +297,10 @@ class scene():
                 pygame.draw.polygon(display, (50, 175, 50), ((i.button_x + i.button_scale // 2 + 50, i.button_y + i.button_scale // 3 * 2),(i.button_x + i.button_scale // 2 // 3 + 50, i.button_y + i.button_scale//3*4),(i.button_x + i.button_scale // 2 // 3 * 5 + 50, i.button_y + i.button_scale // 3 * 4)))
                 pygame.draw.polygon(display, (50, 175, 50), ((i.button_x + i.button_scale // 2 + 50, i.button_y + i.button_scale // 3 * 4),(i.button_x + 50, i.button_y + i.button_scale // 3 * 6),(i.button_x + i.button_scale + 50, i.button_y + i.button_scale // 3 * 6)))
                 pygame.draw.rect(display, (150, 50, 50), (i.button_x + i.button_scale / 2 // 3 * 2 + 50, i.button_y + i.button_scale // 3 * 6,i.button_scale / 2 // 3 * 2, i.button_scale // 2))
-
+            elif i.type == 'kristal':
+                pygame.draw.polygon(display, (50,0,250), ((i.button_x+i.button_scale/6, i.button_y+i.button_scale), (i.button_x, i.button_y + i.button_scale/2), (i.button_x+i.button_scale/3, i.button_y+i.button_scale/3*2), (i.button_x + i.button_scale/2, i.button_y), (i.button_x+i.button_scale/3*2, i.button_y+i.button_scale/6*5), (i.button_x+i.button_scale, i.button_y+i.button_scale/3*2), (i.button_x+i.button_scale/6*5, i.button_y+i.button_scale)))
+            elif i.type == 'text':
+                printtext(i.baz_text, (i.button_x, i.button_y), 32)
             elif 'hero' in i.type:
                 if 'gay' in i.type:
                     pygame.draw.rect(display, (255, 150, 100),(i.button_x + i.button_scale // 2, i.button_y, i.button_scale, i.button_scale))
@@ -322,10 +328,14 @@ class game():
         self.playing = False
         self.scene_num = 0
         self.scenes = []
+        self.ossobennie = []
         if True:
-            self.scenes.append(scene(0, (0, WIDTH - WIDTH//2.5), (0, HEIGHT - HEIGHT//2.3), object(WIDTH / 2 - 50, HEIGHT / 10, 50, None, 0, 'Это какой-то странный портал','portal', 1), object(WIDTH // 30, HEIGHT - HEIGHT // 30 - hero.scale * 10, hero.scale * 20, None, None, None, 'home', 0), object(WIDTH - WIDTH//3 - 25, HEIGHT - HEIGHT*1.05, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH//3, HEIGHT - HEIGHT/9*5, 100, None, None, None, 'les', 0)))
-            self.scenes.append(scene(1, (WIDTH/3, WIDTH/3*2), (0, HEIGHT), object(WIDTH / 2, HEIGHT / 10, 50, None, 0, 'Вернуться', 'portal', 0), object(WIDTH/2, HEIGHT-HEIGHT//3, WIDTH/20//2, 'xarizma', 100, 'Это какой-то странный тип', 'hero_gay', 1, None, 'Иди прямо и все поймешь'), object(WIDTH - WIDTH//3 - 25, HEIGHT - HEIGHT*1.05, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH//3, HEIGHT - HEIGHT/9*5, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH - 25, HEIGHT - HEIGHT*1.05, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH, HEIGHT - HEIGHT/9*5, 100, None, None, None, 'les', 0), object(WIDTH/3, HEIGHT-HEIGHT//20, WIDTH/3, None, 0, 'Идти дальше', 'perexod', 2)))
-            self.scenes.append(scene(2, (0,WIDTH), (0,HEIGHT)))#hgdrghsxdscgx
+            self.scenes.append(scene(0, (0, WIDTH - WIDTH//2.5), (0, HEIGHT - HEIGHT//2.3),WIDTH/2,HEIGHT/10,object(WIDTH / 2 - 50, HEIGHT / 10, 50, None, 0, 'Это какой-то странный портал','portal', 1), object(WIDTH // 30, HEIGHT - HEIGHT // 30 - hero.scale * 10, hero.scale * 20, None, None, None, 'home', 0), object(WIDTH - WIDTH//3 - 25, HEIGHT - HEIGHT*1.05, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH//3, HEIGHT - HEIGHT/9*5, 100, None, None, None, 'les', 0)))
+            self.scenes.append(scene(1, (WIDTH/3, WIDTH/3*2), (0, HEIGHT), WIDTH/2,0, object(WIDTH / 2, HEIGHT / 10, 50, None, 0, 'Вернуться', 'portal', 0), object(WIDTH/2, HEIGHT-HEIGHT//3, WIDTH/20//2, 'xarizma', 100, 'Это какой-то странный тип', 'hero_gay', 1, None, 'Иди прямо и все поймешь'), object(WIDTH - WIDTH//3 - 25, HEIGHT - HEIGHT*1.05, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH//3, HEIGHT - HEIGHT/9*5, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH - 25, HEIGHT - HEIGHT*1.05, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH, HEIGHT - HEIGHT/9*5, 100, None, None, None, 'les', 0), object(WIDTH/3, HEIGHT-HEIGHT//10, WIDTH/6, None, 0, 'Идти дальше', 'perexod', 2)))
+            self.scenes.append(scene(2, (WIDTH/3, WIDTH/3*2), (0,HEIGHT), WIDTH/2,0,object(WIDTH/10*4,HEIGHT//10*7,100, None, 0, 'Так и манит коснуться', 'kristal', 3), object(WIDTH - WIDTH//3 - 25, HEIGHT - HEIGHT*1.05, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH//3, HEIGHT - HEIGHT/9*5, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH - 25, HEIGHT - HEIGHT*1.05, 100, None, None, None, 'les', 0), object(WIDTH - WIDTH, HEIGHT - HEIGHT/9*5, 100, None, None, None, 'les', 0)))
+            self.scenes.append(scene(3, (-200, 0), (-200,0), -200, -200, object(WIDTH/6,HEIGHT/2,1000, None, 0,'','text', 3, text='ЧТО ПРОИСХОДИТ???!!!')))
+            self.ossobennie.append(3)
+            self.scenes.append(scene(4, 0,0,0,0))
 
     def draw(self):
         display.fill((255, 255, 255))
@@ -388,29 +398,41 @@ while playing:
                             hero.char_vospriatie += 1
                             hero.expirience -= 10
     elif game.playing:
+        print(game.scene_num)
         hero.move()
         game.draw()
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_d:
-                    hero.move_direction = 'вправо'
+                    hero.move_direction.append('вправо')
                 elif event.key == pygame.K_s:
-                    hero.move_direction = 'вниз'
+                    hero.move_direction.append('вниз')
                 elif event.key == pygame.K_a:
-                    hero.move_direction = 'влево'
+                    hero.move_direction.append('влево')
                 elif event.key == pygame.K_w:
-                    hero.move_direction = 'вверх'
+                    hero.move_direction.append('вверх')
                 elif event.key == pygame.K_SPACE:
-                    if game.scenes[game.scene_num].active_button != []:
+                    if game.scene_num in game.ossobennie:
+                        game.scene_num = game.scenes[game.scene_num].objects[0].next_num
+                    elif game.scenes[game.scene_num].active_button != []:
                         typeee, indexxx = game.scenes[game.scene_num].button_test()
                         if typeee == True:
-                            game.scene_num = indexxx
+                            if game.scene_num != indexxx:
+                                game.scene_num = indexxx
+                                hero.pos_x = game.scenes[game.scene_num].nach_pos_x
+                                hero.pos_y = game.scenes[game.scene_num].nach_pos_y
                 elif event.key == pygame.K_ESCAPE:
                     game.go_menu()
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_d or event.key == pygame.K_s or event.key == pygame.K_a or event.key == pygame.K_w:
-                    hero.move_direction = 'стой'
+                if event.key == pygame.K_d:
+                    hero.move_direction.remove('вправо')
+                if event.key == pygame.K_s:
+                    hero.move_direction.remove('вниз')
+                if event.key == pygame.K_a:
+                    hero.move_direction.remove('влево')
+                if event.key == pygame.K_w:
+                    hero.move_direction.remove('вверх')
             elif event.type == pygame.QUIT:
                 game.go_menu()
         clock.tick(60)
